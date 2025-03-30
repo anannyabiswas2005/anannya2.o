@@ -1,0 +1,56 @@
+import time
+import random
+import numpy as np
+
+class FallDetection:
+    def __init__(self):
+        self.accel_data = []  # Stores past readings for filtering
+        self.window_size = 5  # Moving average filter window size
+        self.fall_threshold = 2.5  # G-force threshold for fall detection
+        self.impact_duration = 0.3  # Minimum impact time for fall event (seconds)
+    
+    def read_accelerometer(self):
+        """Simulates accelerometer readings (G-force)."""
+        ax = random.uniform(-1.0, 1.0)
+        ay = random.uniform(-1.0, 1.0)
+        az = random.uniform(0.5, 1.5) if random.random() > 0.02 else random.uniform(2.5, 4.0)  # Simulate falls
+        magnitude = np.sqrt(ax**2 + ay**2 + az**2)  # Compute acceleration magnitude
+        return magnitude
+
+    def moving_average_filter(self, new_value):
+        """Applies moving average filtering to smooth acceleration data."""
+        self.accel_data.append(new_value)
+        if len(self.accel_data) > self.window_size:
+            self.accel_data.pop(0)  # Keep window size fixed
+        return np.mean(self.accel_data)
+
+    def detect_fall(self, accel_magnitude):
+        """Detects falls based on acceleration magnitude threshold."""
+        if accel_magnitude > self.fall_threshold:
+            return True
+        return False
+
+    def start_monitoring(self, duration=15, interval=0.5):
+        """Simulates real-time fall detection."""
+        print("📡 Starting Fall Detection System...\n")
+        fall_detected = False
+
+        for _ in range(int(duration / interval)):  # Simulate data collection
+            raw_accel = self.read_accelerometer()
+            filtered_accel = self.moving_average_filter(raw_accel)
+
+            if self.detect_fall(filtered_accel):
+                fall_detected = True
+                print(f"🚨 Fall Detected! (Impact Force: {filtered_accel:.2f} G)")
+                time.sleep(self.impact_duration)  # Simulate fall impact delay
+            else:
+                print(f"✅ Normal Movement: {filtered_accel:.2f} G")
+
+            time.sleep(interval)  # Simulate real-time data processing
+
+        if not fall_detected:
+            print("\n✅ No Falls Detected During Monitoring Session.")
+
+# Run the Fall Detection Simulation
+fall_system = FallDetection()
+fall_system.start_monitoring(duration=15, interval=0.5)  # Simulate for 15 seconds
