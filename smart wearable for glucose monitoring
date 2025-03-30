@@ -1,0 +1,44 @@
+import time
+import random
+import numpy as np
+
+class SmartCGM:
+    def __init__(self):
+        self.glucose_data = []  # Stores past readings for filtering
+        self.window_size = 5  # Moving average window size
+        self.thresholds = {"low": 70, "high": 180}  # Hypo & hyperglycemia limits
+    
+    def read_sensor(self):
+        """Simulates glucose sensor reading (values in mg/dL)."""
+        return random.uniform(60, 200)  # Simulated glucose values
+
+    def moving_average_filter(self, new_value):
+        """Applies moving average filtering to smooth glucose readings."""
+        self.glucose_data.append(new_value)
+        if len(self.glucose_data) > self.window_size:
+            self.glucose_data.pop(0)  # Keep window size fixed
+        return np.mean(self.glucose_data)  # Compute moving average
+
+    def analyze_glucose(self, glucose_level):
+        """Checks if glucose level is in the normal range and triggers alerts."""
+        if glucose_level < self.thresholds["low"]:
+            return f"⚠️ Alert: Hypoglycemia detected! (Glucose: {glucose_level:.2f} mg/dL)"
+        elif glucose_level > self.thresholds["high"]:
+            return f"⚠️ Alert: Hyperglycemia detected! (Glucose: {glucose_level:.2f} mg/dL)"
+        else:
+            return f"✅ Normal: {glucose_level:.2f} mg/dL"
+
+    def start_monitoring(self, duration=10, interval=1):
+        """Simulates real-time glucose monitoring."""
+        print("📡 Starting Continuous Glucose Monitoring...\n")
+        for _ in range(duration):  # Simulate data collection for 'duration' seconds
+            raw_glucose = self.read_sensor()
+            filtered_glucose = self.moving_average_filter(raw_glucose)
+            status = self.analyze_glucose(filtered_glucose)
+            
+            print(status)
+            time.sleep(interval)  # Simulate real-time monitoring
+
+# Run the Smart CGM Simulation
+cgm_device = SmartCGM()
+cgm_device.start_monitoring(duration=15, interval=1)  # Simulate for 15 seconds
